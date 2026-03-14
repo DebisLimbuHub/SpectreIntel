@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1e2a3a #0a0e17;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #0a0e17;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: #1e2a3a;
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #2a4a6b;
+  }
+
+  body {
+    background-color: #0a0e17;
+    color: #e0e0e0;
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: rgba(0, 229, 255, 0.2);
+    color: #00e5ff;
+  }
+}
+
+/* ===== HUD PANEL COMPONENT ===== */
+@layer components {
+  .hud-panel {
+    @apply bg-cyber-panel border border-cyber-border rounded relative overflow-hidden;
+  }
+
+  .hud-panel::before {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-[2px];
+    background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+    opacity: 0.5;
+  }
+
+  .hud-panel-header {
+    @apply flex items-center justify-between px-3 py-2 border-b border-cyber-border;
+  }
+
+  .hud-panel-title {
+    @apply text-xs font-mono font-semibold uppercase tracking-widest text-accent-cyan;
+  }
+
+  .hud-panel-body {
+    @apply p-3;
+  }
+
+  /* Threat badges */
+  .threat-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-mono uppercase tracking-wider;
+  }
+
+  .threat-badge-critical {
+    @apply bg-threat-critical/15 text-threat-critical border border-threat-critical/30;
+  }
+
+  .threat-badge-high {
+    @apply bg-threat-high/15 text-threat-high border border-threat-high/30;
+  }
+
+  .threat-badge-medium {
+    @apply bg-threat-medium/15 text-threat-medium border border-threat-medium/30;
+  }
+
+  .threat-badge-low {
+    @apply bg-threat-low/15 text-threat-low border border-threat-low/30;
+  }
+
+  .threat-badge-info {
+    @apply bg-threat-info/15 text-threat-info border border-threat-info/30;
+  }
+
+  /* NEW tag (activity tracking) */
+  .new-badge {
+    @apply inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase
+           bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 rounded-sm
+           animate-glow;
+  }
+
+  /* Map overrides */
+  .leaflet-container {
+    background: #0a0e17 !important;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .leaflet-popup-content-wrapper {
+    @apply bg-cyber-card border border-cyber-border rounded-sm shadow-lg;
+    color: #e0e0e0;
+  }
+
+  .leaflet-popup-tip {
+    background: #141b2d;
+    border-color: #1e2a3a;
+  }
+
+  .leaflet-control-zoom a {
+    @apply bg-cyber-panel border-cyber-border text-gray-400;
+  }
+
+  .leaflet-control-zoom a:hover {
+    @apply bg-cyber-hover text-accent-cyan;
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@layer utilities {
+  .animate-threat-pulse {
+    animation: threat-pulse 2s ease-in-out infinite;
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+  }
+
+  .text-glow-red {
+    text-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+  }
+
+  .border-glow-cyan {
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.2), inset 0 0 10px rgba(0, 229, 255, 0.05);
+  }
+}
