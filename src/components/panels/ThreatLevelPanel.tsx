@@ -52,13 +52,12 @@ export function ThreatLevelPanel() {
   const needleX = cx + (radius - 8) * Math.cos(scoreAngle);
   const needleY = cy - (radius - 8) * Math.sin(scoreAngle);
 
-  // Colour based on score
+  // Colour based on score — used for header badge, DEFCON label, trend arrow
   const gaugeColour =
-    score >= 9 ? '#E00000' :
-    score >= 7 ? '#E01515' :
-    score >= 5 ? '#D43A1A' :
-    score >= 3 ? '#C46A2A' :
-    '#4A6B3F';
+    score >= 7 ? '#FF0000' :
+    score >= 5 ? '#FF6633' :
+    score >= 3 ? '#FFFFFF' :
+    '#32CD32';
 
   const trendArrow = trend === 'rising' ? '▲' : trend === 'falling' ? '▼' : '—';
   const trendColour = trend === 'rising' ? '#E00000' : trend === 'falling' ? '#4A6B3F' : '#8A8F98';
@@ -83,24 +82,67 @@ export function ThreatLevelPanel() {
       <div className="flex-shrink-0 p-2">
         {/* SVG Gauge */}
         <svg viewBox="0 0 200 110" className="w-full" style={{ maxHeight: '120px' }}>
-          {/* Background arc (dark) */}
+          {/* Background arc (dark track) */}
           <path
             d={arcPath(startAngle, endAngle, radius)}
             fill="none"
-            stroke="rgba(224,21,21,0.15)"
+            stroke="rgba(255, 255, 255, 0.06)"
             strokeWidth="12"
             strokeLinecap="round"
           />
 
-          {/* Coloured arc (filled to score) */}
-          <path
-            d={arcPath(startAngle, scoreAngle, radius)}
-            fill="none"
-            stroke={gaugeColour}
-            strokeWidth="12"
-            strokeLinecap="round"
+          {/* Gradient arc — 50 segments interpolating green → white → red */}
+          {Array.from({ length: 50 }, (_, i) => {
+            const segStart = startAngle - (i / 50) * Math.PI;
+            const segEnd = startAngle - ((i + 1) / 50) * Math.PI;
+            const progress = i / 50;
+
+            if (progress > score / 10) return null;
+
+            let r, g, b;
+            if (progress < 0.4) {
+              const t = progress / 0.4;
+              r = Math.round(50 + t * 205);
+              g = Math.round(205 + t * 50);
+              b = Math.round(50 + t * 205);
+            } else if (progress < 0.6) {
+              const t = (progress - 0.4) / 0.2;
+              r = 255;
+              g = Math.round(255 - t * 55);
+              b = Math.round(255 - t * 200);
+            } else {
+              const t = (progress - 0.6) / 0.4;
+              r = 255;
+              g = Math.round(200 - t * 200);
+              b = Math.round(55 - t * 55);
+            }
+
+            const segColour = `rgb(${r}, ${g}, ${b})`;
+
+            return (
+              <path
+                key={i}
+                d={arcPath(segStart, segEnd, radius)}
+                fill="none"
+                stroke={segColour}
+                strokeWidth="12"
+                strokeLinecap="butt"
+                style={{
+                  filter: progress > 0.7 ? `drop-shadow(0 0 4px ${segColour})` : 'none',
+                  transition: 'all 0.5s ease-out',
+                }}
+              />
+            );
+          })}
+
+          {/* End cap dot at needle tip */}
+          <circle
+            cx={cx + radius * Math.cos(scoreAngle)}
+            cy={cy - radius * Math.sin(scoreAngle)}
+            r="6"
+            fill={gaugeColour}
             style={{
-              filter: `drop-shadow(0 0 6px ${gaugeColour}60)`,
+              filter: `drop-shadow(0 0 6px ${gaugeColour}99)`,
               transition: 'all 1s ease-out',
             }}
           />
@@ -114,11 +156,17 @@ export function ThreatLevelPanel() {
             const y1t = cy - innerR * Math.sin(angle);
             const x2t = cx + outerR * Math.cos(angle);
             const y2t = cy - outerR * Math.sin(angle);
+            const tp = tick / 10;
+            const tickColour = tp < 0.4
+              ? 'rgba(50, 205, 50, 0.4)'
+              : tp < 0.6
+              ? 'rgba(255, 255, 255, 0.4)'
+              : 'rgba(255, 0, 0, 0.4)';
             return (
               <line
                 key={tick}
                 x1={x1t} y1={y1t} x2={x2t} y2={y2t}
-                stroke="rgba(224,21,21,0.1)"
+                stroke={tickColour}
                 strokeWidth="1"
               />
             );
@@ -128,17 +176,19 @@ export function ThreatLevelPanel() {
           <line
             x1={cx} y1={cy}
             x2={needleX} y2={needleY}
-            stroke={gaugeColour}
+            stroke="#FFFFFF"
             strokeWidth="2"
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 4px ${gaugeColour}80)`,
-              transition: 'all 1s ease-out',
+              filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.5))',
+              transition: 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}
           />
 
           {/* Centre dot */}
-          <circle cx={cx} cy={cy} r="4" fill={gaugeColour} opacity="0.8" />
+          <circle cx={cx} cy={cy} r="4" fill="#FFFFFF" opacity="0.8"
+            style={{ filter: 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.5))' }}
+          />
 
           {/* Score text */}
           <text
@@ -148,14 +198,17 @@ export function ThreatLevelPanel() {
             fontSize="22"
             fontWeight="700"
             fontFamily="'Orbitron', monospace"
-            style={{ filter: `drop-shadow(0 0 8px ${gaugeColour}60)` }}
+            style={{
+              filter: `drop-shadow(0 0 8px ${gaugeColour}80)`,
+              transition: 'fill 1s ease-out',
+            }}
           >
             {score.toFixed(1)}
           </text>
 
           {/* Scale labels */}
-          <text x="22" y={cy + 8} fill="#4a4a4a" fontSize="8" fontFamily="'JetBrains Mono', monospace">0</text>
-          <text x="170" y={cy + 8} fill="#4a4a4a" fontSize="8" fontFamily="'JetBrains Mono', monospace">10</text>
+          <text x="22" y={cy + 8} fill="#32CD32" fontSize="8" fontFamily="'JetBrains Mono', monospace" opacity="0.6">0</text>
+          <text x="170" y={cy + 8} fill="#FF0000" fontSize="8" fontFamily="'JetBrains Mono', monospace" opacity="0.6">10</text>
         </svg>
 
         {/* DEFCON Label */}
