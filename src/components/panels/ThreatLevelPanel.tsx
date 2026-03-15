@@ -55,8 +55,8 @@ export function ThreatLevelPanel() {
   // Colour based on score — used for header badge, DEFCON label, trend arrow
   const gaugeColour =
     score >= 7 ? '#FF0000' :
-    score >= 5 ? '#FF6633' :
-    score >= 3 ? '#FFFFFF' :
+    score >= 5 ? '#FF6600' :
+    score >= 3 ? '#FFDD00' :
     '#32CD32';
 
   const trendArrow = trend === 'rising' ? '▲' : trend === 'falling' ? '▼' : '—';
@@ -99,22 +99,22 @@ export function ThreatLevelPanel() {
 
             if (progress > score / 10) return null;
 
+            // Interpolate colour: green → yellow → red
             let r, g, b;
-            if (progress < 0.4) {
-              const t = progress / 0.4;
-              r = Math.round(50 + t * 205);
-              g = Math.round(205 + t * 50);
-              b = Math.round(50 + t * 205);
-            } else if (progress < 0.6) {
-              const t = (progress - 0.4) / 0.2;
+            if (progress < 0.45) {
+              const t = progress / 0.45;
+              r = Math.round(50 + t * 205);   // 50 → 255
+              g = Math.round(205 + t * 50);   // 205 → 255
+              b = Math.round(50 - t * 50);    // 50 → 0
+            } else if (progress < 0.55) {
               r = 255;
-              g = Math.round(255 - t * 55);
-              b = Math.round(255 - t * 200);
+              g = 255;
+              b = 0;
             } else {
-              const t = (progress - 0.6) / 0.4;
+              const t = (progress - 0.55) / 0.45;
               r = 255;
-              g = Math.round(200 - t * 200);
-              b = Math.round(55 - t * 55);
+              g = Math.round(255 - t * 255);  // 255 → 0
+              b = 0;
             }
 
             const segColour = `rgb(${r}, ${g}, ${b})`;
@@ -140,9 +140,9 @@ export function ThreatLevelPanel() {
             cx={cx + radius * Math.cos(scoreAngle)}
             cy={cy - radius * Math.sin(scoreAngle)}
             r="6"
-            fill={gaugeColour}
+            fill={score >= 7 ? '#FF0000' : score >= 4 ? '#FFDD00' : '#32CD32'}
             style={{
-              filter: `drop-shadow(0 0 6px ${gaugeColour}99)`,
+              filter: `drop-shadow(0 0 6px ${score >= 7 ? 'rgba(255,0,0,0.6)' : score >= 4 ? 'rgba(255,220,0,0.5)' : 'rgba(50,205,50,0.6)'})`,
               transition: 'all 1s ease-out',
             }}
           />
@@ -160,7 +160,7 @@ export function ThreatLevelPanel() {
             const tickColour = tp < 0.4
               ? 'rgba(50, 205, 50, 0.4)'
               : tp < 0.6
-              ? 'rgba(255, 255, 255, 0.4)'
+              ? 'rgba(255, 220, 0, 0.4)'
               : 'rgba(255, 0, 0, 0.4)';
             return (
               <line
@@ -194,12 +194,12 @@ export function ThreatLevelPanel() {
           <text
             x={cx} y={cy + 20}
             textAnchor="middle"
-            fill={gaugeColour}
+            fill={score >= 7 ? '#FF0000' : score >= 4 ? '#FFDD00' : '#32CD32'}
             fontSize="22"
             fontWeight="700"
             fontFamily="'Orbitron', monospace"
             style={{
-              filter: `drop-shadow(0 0 8px ${gaugeColour}80)`,
+              filter: `drop-shadow(0 0 8px ${score >= 7 ? 'rgba(255,0,0,0.5)' : score >= 4 ? 'rgba(255,220,0,0.4)' : 'rgba(50,205,50,0.5)'})`,
               transition: 'fill 1s ease-out',
             }}
           >
