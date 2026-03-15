@@ -89,7 +89,7 @@ export function CyberStocksPanel() {
   const losers = loaded.filter((q) => q.change < 0).length;
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '350px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">📈 CYBER STOCKS</span>
         <div className="flex items-center gap-1.5">

@@ -345,18 +345,40 @@ export function ThreatMap() {
         <MapStat label="Attack Vectors" count={ATTACK_ARCS.length} colour="#D43A1A" />
       </div>
 
-      {/* Grid overlay — primary 100px grid + secondary 25px grid */}
+      {/* Grid overlay — use repeating gradients to avoid tiled seam gaps */}
       <div
         className="absolute inset-0 pointer-events-none z-[500]"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(224, 21, 21, 1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(224, 21, 21, 1) 1px, transparent 1px),
-            linear-gradient(rgba(224, 21, 21, 1) 0.5px, transparent 0.5px),
-            linear-gradient(90deg, rgba(224, 21, 21, 1) 0.5px, transparent 0.5px)
+            repeating-linear-gradient(
+              to bottom,
+              rgba(224, 21, 21, 0.05) 0,
+              rgba(224, 21, 21, 0.05) 1px,
+              transparent 1px,
+              transparent 80px
+            ),
+            repeating-linear-gradient(
+              to right,
+              rgba(224, 21, 21, 0.05) 0,
+              rgba(224, 21, 21, 0.05) 1px,
+              transparent 1px,
+              transparent 80px
+            ),
+            repeating-linear-gradient(
+              to bottom,
+              rgba(224, 21, 21, 0.025) 0,
+              rgba(224, 21, 21, 0.025) 1px,
+              transparent 1px,
+              transparent 20px
+            ),
+            repeating-linear-gradient(
+              to right,
+              rgba(224, 21, 21, 0.025) 0,
+              rgba(224, 21, 21, 0.025) 1px,
+              transparent 1px,
+              transparent 20px
+            )
           `,
-          backgroundSize: '100px 100px, 100px 100px, 25px 25px, 25px 25px',
-          opacity: 0.045,
         }}
       />
 

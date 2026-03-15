@@ -131,7 +131,7 @@ export function TopTargetsPanel() {
     }));
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '160px' }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">🎯 TOP TARGETS</span>
         <span className="text-[9px] font-mono text-gray-500">{displayTargets.length} pairs</span>

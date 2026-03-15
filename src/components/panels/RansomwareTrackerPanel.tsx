@@ -97,7 +97,7 @@ export function RansomwareTrackerPanel() {
   const totalHits = groups.reduce((sum, g) => sum + g.count, 0);
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '250px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">🔒 RANSOMWARE TRACKER</span>
         <span className="text-[9px] font-mono text-gray-500">

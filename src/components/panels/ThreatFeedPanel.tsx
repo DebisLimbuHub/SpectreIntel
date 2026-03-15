@@ -22,7 +22,7 @@ export function ThreatFeedPanel() {
   const filteredClusters = filterByTime(clusters, timeFilter, (c) => c.primary.publishedAt);
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '500px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">📡 THREAT INTEL FEED</span>
         <span className="text-[9px] font-mono text-gray-500">

@@ -30,7 +30,7 @@ export function ActiveThreatsPanel() {
   const highCount = filteredClusters.filter((c) => c.severity === 'high').length;
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '350px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">🎯 ACTIVE THREATS (24H)</span>
         <div className="flex items-center gap-1.5">

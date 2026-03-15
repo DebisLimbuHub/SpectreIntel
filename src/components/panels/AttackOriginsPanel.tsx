@@ -62,7 +62,7 @@ export function AttackOriginsPanel() {
   const totalMentions = origins.reduce((sum, o) => sum + o.count, 0);
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '250px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">🌍 ATTACK ORIGINS</span>
         <span className="text-[9px] font-mono text-gray-500">

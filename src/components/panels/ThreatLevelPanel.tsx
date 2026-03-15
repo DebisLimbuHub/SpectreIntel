@@ -13,7 +13,7 @@ export function ThreatLevelPanel() {
 
   if (!threatLevel) {
     return (
-      <div className="hud-panel h-full flex flex-col overflow-hidden">
+      <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '380px', flexShrink: 0 }}>
         <div className="hud-panel-header flex-shrink-0">
           <span className="hud-panel-title">🎚️ THREAT LEVEL</span>
         </div>
@@ -64,7 +64,7 @@ export function ThreatLevelPanel() {
   const trendColour = trend === 'rising' ? '#E00000' : trend === 'falling' ? '#4A6B3F' : '#8A8F98';
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '380px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">🎚️ THREAT LEVEL</span>
         <span

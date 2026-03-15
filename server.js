@@ -293,7 +293,7 @@ app.get('/api/youtube-live', async (req, res) => {
           handle: info.handle,
           videoId,
           embedUrl: videoId
-            ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0`
+            ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0`
             : null,
           isLive: liveIdCache.get(id)?.isLive || false,
         };
@@ -313,7 +313,7 @@ app.get('/api/youtube-live', async (req, res) => {
     channel: channelId,
     name: info?.name,
     videoId,
-    embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0`,
+    embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0`,
     isLive: liveIdCache.get(channelId)?.isLive || false,
   });
 });

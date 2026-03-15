@@ -181,6 +181,68 @@
   100% { top: 100%; }
 }
 
+/* ===== SIDEBAR SCROLLBAR — thin red themed ===== */
+aside {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(224, 21, 21, 0.25) transparent;
+  scroll-behavior: smooth;
+}
+
+aside::-webkit-scrollbar {
+  width: 4px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background: rgba(224, 21, 21, 0.25);
+  border-radius: 4px;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background: rgba(224, 21, 21, 0.5);
+}
+
+/* ===== MOBILE RESPONSIVE — sidebars become horizontal rows ===== */
+@media (max-width: 1024px) {
+  main {
+    flex-direction: column !important;
+  }
+
+  main > aside {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 40vh !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    padding: 4px 8px !important;
+  }
+
+  main > aside > * {
+    min-width: 280px !important;
+    flex-shrink: 0 !important;
+  }
+
+  main > section {
+    min-height: 50vh !important;
+  }
+}
+
+@media (max-width: 768px) {
+  main > aside {
+    max-height: 35vh !important;
+  }
+
+  main > section {
+    min-height: 40vh !important;
+  }
+}
+
 @keyframes grain-flicker {
   0%   { transform: translate(0, 0); }
   25%  { transform: translate(-2px, 1px); }

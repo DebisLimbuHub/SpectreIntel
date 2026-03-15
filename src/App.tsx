@@ -7,7 +7,6 @@ import { ThreatMap } from './components/map/ThreatMap';
 import { ThreatFeedPanel } from './components/panels/ThreatFeedPanel';
 import { ActiveThreatsPanel } from './components/panels/ActiveThreatsPanel';
 import { AttackOriginsPanel } from './components/panels/AttackOriginsPanel';
-import { TopTargetsPanel } from './components/panels/TopTargetsPanel';
 import { CVEFeedPanel } from './components/panels/CVEFeedPanel';
 import { ThreatLevelPanel } from './components/panels/ThreatLevelPanel';
 import { InfraRiskPanel } from './components/panels/InfraRiskPanel';
@@ -90,28 +89,28 @@ export default function App() {
           {/* Main Dashboard Area */}
           <main className="flex-1 flex overflow-hidden">
 
-            {/* ===== LEFT SIDEBAR ===== */}
-            <aside className="w-72 flex-shrink-0 flex flex-col gap-1 p-1 overflow-y-auto">
-              {/* Threat feed gets the most space but is capped */}
-              <div className="min-h-[200px] max-h-[35vh] flex flex-col">
-                <ThreatFeedPanel />
-              </div>
-              {/* Active threats — always visible */}
-              <div className="min-h-[160px] max-h-[25vh] flex flex-col">
-                <ActiveThreatsPanel />
-              </div>
-              {/* Attack origins — always visible */}
-              <div className="min-h-[150px] max-h-[22vh] flex flex-col">
-                <AttackOriginsPanel />
-              </div>
-              {/* Top targets */}
-              <div className="min-h-[140px] max-h-[22vh] flex flex-col">
-                <TopTargetsPanel />
-              </div>
+            {/* ===== LEFT SIDEBAR — independently scrollable ===== */}
+            <aside
+              style={{
+                width: '288px',
+                flexShrink: 0,
+                height: 'calc(100vh - 68px)',
+                overflowY: 'scroll',
+                overflowX: 'hidden',
+                padding: '4px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+              }}
+            >
+              <LiveChannelsPanel />
+              <ThreatFeedPanel />
+              <ActiveThreatsPanel />
+              <AttackOriginsPanel />
             </aside>
 
-            {/* ===== CENTRE MAP ===== */}
-            <section className="flex-1 relative">
+            {/* ===== CENTRE MAP — fills remaining space, never scrolls ===== */}
+            <section className="flex-1 relative overflow-hidden">
               <ThreatMap />
 
               <div className="absolute top-2 right-2 z-[1000]">
@@ -123,36 +122,26 @@ export default function App() {
               </div>
             </section>
 
-            {/* ===== RIGHT SIDEBAR ===== */}
-            <aside className="w-72 flex-shrink-0 flex flex-col gap-1 p-1 overflow-y-auto">
-              {/* Threat gauge — needs full height for the SVG arc */}
-              <div className="min-h-[290px] max-h-[38vh] flex flex-col">
-                <ThreatLevelPanel />
-              </div>
-              {/* Infra risk */}
-              <div className="min-h-[160px] max-h-[25vh] flex flex-col">
-                <InfraRiskPanel />
-              </div>
-              {/* CVE feed */}
-              <div className="min-h-[200px] max-h-[30vh] flex flex-col">
-                <CVEFeedPanel />
-              </div>
-              {/* Signals */}
-              <div className="min-h-[120px] max-h-[22vh] flex flex-col">
-                <SignalPanel />
-              </div>
-              {/* Ransomware tracker */}
-              <div className="min-h-[130px] max-h-[22vh] flex flex-col">
-                <RansomwareTrackerPanel />
-              </div>
-              {/* Cyber stocks */}
-              <div className="min-h-[180px] max-h-[30vh] flex flex-col">
-                <CyberStocksPanel />
-              </div>
-              {/* Live channels */}
-              <div className="min-h-[360px] max-h-[45vh] flex flex-col">
-                <LiveChannelsPanel />
-              </div>
+            {/* ===== RIGHT SIDEBAR — independently scrollable ===== */}
+            <aside
+              style={{
+                width: '288px',
+                flexShrink: 0,
+                height: 'calc(100vh - 68px)',
+                overflowY: 'scroll',
+                overflowX: 'hidden',
+                padding: '4px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+              }}
+            >
+              <ThreatLevelPanel />
+              <InfraRiskPanel />
+              <CVEFeedPanel />
+              <SignalPanel />
+              <RansomwareTrackerPanel />
+              <CyberStocksPanel />
             </aside>
 
           </main>

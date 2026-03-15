@@ -22,7 +22,7 @@ export function SignalPanel() {
   const activeSignals = signals.filter((s) => new Date(s.expiresAt) > new Date());
 
   return (
-    <div className="hud-panel h-full flex flex-col overflow-hidden">
+    <div className="hud-panel flex flex-col overflow-hidden" style={{ height: '220px', flexShrink: 0 }}>
       <div className="hud-panel-header flex-shrink-0">
         <span className="hud-panel-title">⚡ SIGNALS</span>
         <div className="flex items-center gap-1">

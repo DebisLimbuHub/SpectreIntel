@@ -20,7 +20,6 @@ export function getBestInitialSource(channel: Pick<LiveChannel, 'sources'>): Liv
 export function buildYouTubeEmbedUrl(source: LiveChannelSource): string {
   const params = new URLSearchParams({
     autoplay: '1',
-    mute: '1',
     playsinline: '1',
     rel: '0',
   });
