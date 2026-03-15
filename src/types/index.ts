@@ -1,3 +1,15 @@
+// ===== PODCAST TYPES =====
+
+export interface PodcastEpisode {
+  id: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  durationMs: number;
+  thumbnailUrl: string;
+  externalUrl: string;
+}
+
 // ===== THREAT INTELLIGENCE TYPES =====
 
 export type ThreatSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';

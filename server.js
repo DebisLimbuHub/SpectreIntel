@@ -383,6 +383,173 @@ function stripHtml(html) {
   return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 300);
 }
 
+// ===== PODCAST EPISODES (RSS + iTunes fallback) =====
+
+// In-memory cache: podcast name → { feedUrl, items, cachedAt }
+const podcastEpisodeCache = new Map();
+const PODCAST_CACHE_TTL = 20 * 60 * 1000; // 20 minutes
+
+async function fetchRssFeed(feedUrl) {
+  const resp = await fetch(feedUrl, {
+    headers: {
+      'User-Agent': 'ProjectX-CyberMonitor/0.1',
+      'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+    },
+    signal: AbortSignal.timeout(12000),
+  });
+  if (!resp.ok) return null;
+  const text = await resp.text();
+  const items = parseRSS(text, feedUrl);
+  return items.length > 0 ? items : null;
+}
+
+app.get('/api/podcast-episodes', async (req, res) => {
+  const name = req.query.name;
+  const rssUrl = req.query.rssUrl;
+
+  if (!name || typeof name !== 'string') {
+    return res.status(400).json({ ok: false, error: 'Missing name parameter' });
+  }
+
+  // Return from cache if fresh
+  const cached = podcastEpisodeCache.get(name);
+  if (cached && (Date.now() - cached.cachedAt) < PODCAST_CACHE_TTL) {
+    return res.json({ ok: true, episodes: cached.items.slice(0, 10), source: 'cache' });
+  }
+
+  // Strategy 1: try the hardcoded rssUrl
+  if (rssUrl && typeof rssUrl === 'string') {
+    try {
+      const items = await fetchRssFeed(rssUrl);
+      if (items) {
+        podcastEpisodeCache.set(name, { items, cachedAt: Date.now() });
+        return res.json({ ok: true, episodes: items.slice(0, 10), source: rssUrl });
+      }
+    } catch (e) {
+      console.warn(`[Podcast] rssUrl failed for "${name}":`, e.message);
+    }
+  }
+
+  // Strategy 2: discover via Apple iTunes API (returns authoritative feedUrl)
+  try {
+    const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(name)}&entity=podcast&limit=5`;
+    const itunesResp = await fetch(itunesUrl, {
+      headers: { 'User-Agent': 'ProjectX-CyberMonitor/0.1' },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (itunesResp.ok) {
+      const itunesData = await itunesResp.json();
+      for (const result of (itunesData.results || [])) {
+        const feedUrl = result.feedUrl;
+        if (!feedUrl) continue;
+        try {
+          const items = await fetchRssFeed(feedUrl);
+          if (items) {
+            console.log(`[Podcast] iTunes resolved "${name}" → ${feedUrl}`);
+            podcastEpisodeCache.set(name, { items, cachedAt: Date.now() });
+            return res.json({ ok: true, episodes: items.slice(0, 10), source: feedUrl });
+          }
+        } catch {
+          continue;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(`[Podcast] iTunes lookup failed for "${name}":`, e.message);
+  }
+
+  res.status(502).json({ ok: false, error: 'Could not load episodes for this podcast', episodes: [] });
+});
+
+// ===== SPOTIFY EPISODE PROXY =====
+
+app.get('/api/spotify-episodes', async (req, res) => {
+  const showId = req.query.showId;
+  if (!showId || typeof showId !== 'string' || !/^[a-zA-Z0-9]{22}$/.test(showId)) {
+    return res.status(400).json({ error: 'Invalid showId' });
+  }
+
+  try {
+    const url = `https://open.spotify.com/show/${showId}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Spotify returned ${response.status}`);
+    }
+
+    const html = await response.text();
+    const episodes = [];
+
+    // Method 1: __NEXT_DATA__ embedded JSON
+    const nextDataMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+    if (nextDataMatch) {
+      try {
+        const jsonData = JSON.parse(nextDataMatch[1]);
+        const entity = jsonData?.props?.pageProps?.state?.data?.entity;
+        if (entity) {
+          const items = entity.episodeV2?.items || entity.episodes?.items || [];
+          for (const item of items.slice(0, 20)) {
+            const ep = item?.entity?.data || item?.data || item;
+            if (!ep) continue;
+            const id = ep.uri?.split(':').pop() || ep.id || '';
+            episodes.push({
+              id,
+              title: ep.name || ep.title || 'Untitled',
+              description: (ep.description || ep.htmlDescription || '')
+                .replace(/<[^>]*>/g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 200),
+              publishedAt: ep.releaseDate?.isoString || ep.releaseDate || ep.publishDate || '',
+              durationMs: ep.duration?.totalMilliseconds || ep.durationMs || 0,
+              thumbnailUrl: ep.coverArt?.sources?.[0]?.url || '',
+              externalUrl: id ? `https://open.spotify.com/episode/${id}` : `https://open.spotify.com/show/${showId}`,
+            });
+          }
+        }
+      } catch (parseErr) {
+        console.error('[Spotify] __NEXT_DATA__ parse error:', parseErr.message);
+      }
+    }
+
+    // Method 2: regex fallback
+    if (episodes.length === 0) {
+      const episodeRegex = /"name":"([^"]+)"[^}]*?"releaseDate":\{"isoString":"([^"]+)"[^}]*?"totalMilliseconds":(\d+)/g;
+      let match;
+      let count = 0;
+      while ((match = episodeRegex.exec(html)) !== null && count < 10) {
+        episodes.push({
+          id: `ep-${count}`,
+          title: match[1],
+          description: '',
+          publishedAt: match[2],
+          durationMs: parseInt(match[3], 10),
+          thumbnailUrl: '',
+          externalUrl: `https://open.spotify.com/show/${showId}`,
+        });
+        count++;
+      }
+    }
+
+    // Sort newest first
+    episodes.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+    res.json({ ok: true, showId, episodeCount: episodes.length, episodes: episodes.slice(0, 10) });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error(`[Spotify] Episode fetch failed for ${showId}:`, message);
+    res.status(502).json({ error: message, episodes: [] });
+  }
+});
+
 // ===== START =====
 
 app.listen(PORT, () => {
@@ -391,5 +558,6 @@ app.listen(PORT, () => {
   console.log(`  🐛 CISA KEV:   /api/cisa-kev`);
   console.log(`  🔍 NVD search: /api/nvd?keyword=<term>`);
   console.log(`  📈 Stocks:     /api/stocks?symbols=CRWD,PANW,...`);
-  console.log(`  📺 YouTube:    /api/youtube-live?channel=<id>\n`);
+  console.log(`  📺 YouTube:    /api/youtube-live?channel=<id>`);
+  console.log(`  🎧 Episodes:   /api/podcast-episodes?name=<show_name>&rssUrl=<optional_rss_url>\n`);
 });
