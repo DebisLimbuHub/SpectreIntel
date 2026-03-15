@@ -230,19 +230,28 @@ export function ThreatMap() {
       maxBounds: [[-85, -Infinity], [85, Infinity]],
     });
 
-    // Dark tiles — CartoDB Dark Matter (no labels for cleaner overlay)
+    // Create a dedicated pane for labels above all overlays, with NO colour filter
+    map.createPane('labels');
+    const labelsPane = map.getPane('labels');
+    if (labelsPane) {
+      labelsPane.style.zIndex = '650';
+      labelsPane.style.pointerEvents = 'none';
+      labelsPane.style.filter = 'none';
+    }
+
+    // Dark tiles — CartoDB Dark Matter (no labels)
     L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
       { subdomains: 'abcd', maxZoom: 19 }
     ).addTo(map);
 
-    // Optional: add labels as a separate layer on top
+    // Labels on the dedicated pane — unaffected by tilePane filter
     L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
-      { subdomains: 'abcd', maxZoom: 19, opacity: 0.25 }
+      { subdomains: 'abcd', maxZoom: 19, opacity: 0.9, pane: 'labels' }
     ).addTo(map);
 
-    // Apply red hue filter to map tiles
+    // Apply red hue filter only to the base tile pane (labels pane is separate)
     const tilePane = map.getPane('tilePane');
     if (tilePane) {
       tilePane.style.filter = 'brightness(0.6) saturate(0.5) sepia(0.4) hue-rotate(-30deg) contrast(1.15)';
@@ -422,13 +431,11 @@ export function ThreatMap() {
         }}
       />
 
-      {/* Heavy vignette — corners nearly black */}
+      {/* Heavy vignette — corners nearly black (z-[500] keeps it below labels pane at 650) */}
       <div
-        className="absolute inset-0 pointer-events-none z-[700]"
+        className="absolute inset-0 pointer-events-none z-[500]"
         style={{
-          background: `
-            radial-gradient(ellipse at center, transparent 25%, rgba(5, 6, 8, 0.3) 55%, rgba(5, 6, 8, 0.7) 80%, rgba(5, 6, 8, 0.95) 100%)
-          `,
+          background: 'radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(5, 6, 8, 0.5) 82%, rgba(5, 6, 8, 0.92) 100%)',
         }}
       />
     </div>

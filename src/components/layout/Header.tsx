@@ -17,7 +17,7 @@ export function Header() {
           className="font-display text-sm font-semibold tracking-wider text-[#E8E8E8]"
           style={{ textShadow: '0 0 10px rgba(224, 21, 21, 0.7), 0 0 3px rgba(224, 21, 21, 0.9)' }}
         >
-          SPECTRE INTEL
+          SPECTRE INTEL<sup className="text-[7px] font-mono font-normal text-gray-500 tracking-normal ml-1 -top-1 relative">Beta</sup>
         </h1>
         <span className="text-[9px] font-mono text-gray-600 bg-cyber-card px-1.5 py-0.5 rounded">
           v{__APP_VERSION__}
