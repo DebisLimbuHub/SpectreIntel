@@ -1,5 +1,4 @@
 import { useCyberStore } from '@/store';
-import { APT_GROUPS } from '@/config/apt-groups';
 import { filterByTime } from '@/utils/time-filter';
 import type { ThreatCluster } from '@/types';
 

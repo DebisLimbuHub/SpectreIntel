@@ -63,7 +63,7 @@ interface TickerItem {
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
-const MOCK_ALERTS: NewsAlert[] = [
+export const MOCK_ALERTS: NewsAlert[] = [
   {
     id: 'a1',
     title: 'Critical Zero-Day Exploited in Fortinet FortiOS — Active Exploitation Confirmed',
@@ -463,7 +463,7 @@ const SEVERITY_CONFIG: Record<ThreatSeverity, { label: string; colour: string; b
   info:     { label: 'INFO',     colour: '#8A8F98', bg: 'rgba(138,143,152,0.12)',border: 'rgba(138,143,152,0.35)' },
 };
 
-const SEV_ORDER: Record<ThreatSeverity, number> = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+export const SEV_ORDER: Record<ThreatSeverity, number> = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -518,7 +518,7 @@ function NewsHeader({ activeTab, onTabChange, searchQuery, onSearchChange }: Hea
 
         {/* Live badge */}
         <span className="flex items-center gap-1 bg-threat-critical/15 border border-threat-critical/40 text-threat-critical text-[8px] font-mono font-bold px-2 py-0.5 rounded-sm flex-shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-threat-critical animate-pulse inline-block" />
+          <span className="w-1.5 h-1.5 rounded-full bg-threat-safe animate-pulse inline-block" />
           LIVE
         </span>
 
@@ -560,7 +560,7 @@ function NewsHeader({ activeTab, onTabChange, searchQuery, onSearchChange }: Hea
   );
 }
 
-function FeaturedAlert({ alert }: { alert: NewsAlert }) {
+export function FeaturedAlert({ alert }: { alert: NewsAlert }) {
   const cfg = SEVERITY_CONFIG[alert.severity];
   const url = sanitiseUrl(alert.link);
 
@@ -644,7 +644,7 @@ function StatBox({ value, label, colour, icon }: StatBoxProps) {
   );
 }
 
-function StatsSidebar({ alerts }: { alerts: NewsAlert[] }) {
+export function StatsSidebar({ alerts }: { alerts: NewsAlert[] }) {
   const critical = alerts.filter((a) => a.severity === 'critical').length;
   const apts = alerts.filter((a) => a.category === 'APT').length;
   const zeroDays = alerts.filter((a) => a.category === 'Zero-Day').length;
@@ -675,7 +675,7 @@ interface FilterBarProps {
   resultCount: number;
 }
 
-function FilterBar({ threatFilter, onThreatFilter, sortBy, onSortBy, resultCount }: FilterBarProps) {
+export function FilterBar({ threatFilter, onThreatFilter, sortBy, onSortBy, resultCount }: FilterBarProps) {
   const levels: (ThreatSeverity | 'all')[] = ['all', 'critical', 'high', 'medium', 'low', 'info'];
 
   return (
@@ -793,7 +793,7 @@ function ChannelCard({ channel, expanded, onToggle }: { channel: NewsChannel; ex
   );
 }
 
-function ChannelsGrid({ expandedChannel, onToggle }: { expandedChannel: string | null; onToggle: (id: string) => void }) {
+export function ChannelsGrid({ expandedChannel, onToggle }: { expandedChannel: string | null; onToggle: (id: string) => void }) {
   return (
     <div>
       <div className="flex items-center gap-3 mb-3">
@@ -843,7 +843,7 @@ function LegacyPodcastCard({ podcast }: { podcast: Podcast }) {
   );
 }
 
-function PodcastsRow() {
+export function PodcastsRow() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-3">
@@ -871,7 +871,7 @@ const CATEGORY_LABELS: Record<CyberPodcast['category'], string> = {
   'offensive':    'OFFENSIVE',
 };
 
-function CategoryBadge({ category }: { category: CyberPodcast['category'] }) {
+export function CategoryBadge({ category }: { category: CyberPodcast['category'] }) {
   return (
     <span
       className="text-[7px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-sm border"
@@ -886,7 +886,7 @@ function CategoryBadge({ category }: { category: CyberPodcast['category'] }) {
   );
 }
 
-function FrequencyBadge({ frequency }: { frequency: string }) {
+export function FrequencyBadge({ frequency }: { frequency: string }) {
   return (
     <span className="text-[7px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-sm border border-cyber-border text-gray-500">
       {frequency}
@@ -1953,39 +1953,6 @@ function SignalChain() {
 export function CybersecurityNews() {
   const [activeTab, setActiveTab] = useState<Tab>('news');
   const [searchQuery, setSearchQuery] = useState('');
-  const [threatFilter, setThreatFilter] = useState<ThreatSeverity | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'severity' | 'category'>('date');
-  const [expandedChannel, setExpandedChannel] = useState<string | null>(null);
-
-  const filteredAlerts = useMemo(() => {
-    let result = MOCK_ALERTS;
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (a) =>
-          a.title.toLowerCase().includes(q) ||
-          a.source.toLowerCase().includes(q) ||
-          a.category.toLowerCase().includes(q)
-      );
-    }
-
-    if (threatFilter !== 'all') {
-      result = result.filter((a) => a.severity === threatFilter);
-    }
-
-    return [...result].sort((a, b) => {
-      if (sortBy === 'date') return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-      if (sortBy === 'severity') return SEV_ORDER[a.severity] - SEV_ORDER[b.severity];
-      return a.category.localeCompare(b.category);
-    });
-  }, [searchQuery, threatFilter, sortBy]);
-
-  const featuredAlert = filteredAlerts[0] ?? MOCK_ALERTS[0];
-
-  function handleChannelToggle(id: string) {
-    setExpandedChannel((prev) => (prev === id ? null : id));
-  }
 
   return (
     <div className="bg-cyber-bg min-h-screen flex flex-col font-sans">

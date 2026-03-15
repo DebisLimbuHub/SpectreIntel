@@ -18,7 +18,7 @@ import { SearchModal } from './components/shared/SearchModal';
 import { useDataOrchestrator } from './hooks/useDataOrchestrator';
 
 /**
- * Project X — Cyber Monitor Main Application
+ * Project X — Spectre Intel Main Application
  * Phase 5: Polish — constrained panel sizes, ticker fix, all panels visible.
  */
 

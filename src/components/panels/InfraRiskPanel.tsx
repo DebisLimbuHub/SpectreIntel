@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useCyberStore } from '@/store';
 import { filterByTime } from '@/utils/time-filter';
-import type { ThreatSeverity, SectorRisk } from '@/types';
+import type { SectorRisk } from '@/types';
 
 /**
  * Infrastructure Risk Panel — Per-sector risk levels.

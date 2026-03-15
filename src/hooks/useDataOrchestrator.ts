@@ -102,7 +102,6 @@ export function useDataOrchestrator() {
 
     // Calculate threat level
     const criticalClusters = clusters.filter((c) => c.severity === 'critical').length;
-    const highClusters = clusters.filter((c) => c.severity === 'high').length;
     const kevCount = cves.filter((c) => c.isKEV && c.isExploitedInWild).length;
     const velocitySpikes = clusters.filter((c) => c.velocity.level === 'spike').length;
 

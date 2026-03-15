@@ -197,13 +197,15 @@ export function detectTriangulation(clusters: ThreatCluster[]): CyberSignal[] {
   const signals: CyberSignal[] = [];
 
   for (const cluster of clusters) {
-    const allSources = [cluster.primary.id, ...cluster.related.map((r) => r.id)];
     const allFeedIds = [cluster.primary.source, ...cluster.related.map((r) => r.source)];
 
     // Check if we have Gov + Vendor + Press
-    const hasGov = allFeedIds.some((id) => SOURCE_TYPES.gov.includes(id));
-    const hasVendor = allFeedIds.some((id) => SOURCE_TYPES.vendor.includes(id));
-    const hasPress = allFeedIds.some((id) => SOURCE_TYPES.press.includes(id));
+    const gov = SOURCE_TYPES.gov as readonly string[];
+    const vendor = SOURCE_TYPES.vendor as readonly string[];
+    const press = SOURCE_TYPES.press as readonly string[];
+    const hasGov = allFeedIds.some((id) => gov.includes(id));
+    const hasVendor = allFeedIds.some((id) => vendor.includes(id));
+    const hasPress = allFeedIds.some((id) => press.includes(id));
 
     if (hasGov && hasVendor && hasPress) {
       const signal = makeSignal(

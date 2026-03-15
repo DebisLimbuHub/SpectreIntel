@@ -1,4 +1,5 @@
 import { useCyberStore } from '@/store';
+import type { ThreatLevel } from '@/types';
 import { SignalBadge } from '@/components/panels/SignalPanel';
 
 export function Header() {
@@ -16,7 +17,7 @@ export function Header() {
           className="font-display text-sm font-semibold tracking-wider text-[#E8E8E8]"
           style={{ textShadow: '0 0 10px rgba(224, 21, 21, 0.7), 0 0 3px rgba(224, 21, 21, 0.9)' }}
         >
-          CYBER MONITOR
+          SPECTRE INTEL
         </h1>
         <span className="text-[9px] font-mono text-gray-600 bg-cyber-card px-1.5 py-0.5 rounded">
           v{__APP_VERSION__}
@@ -56,7 +57,7 @@ export function Header() {
   );
 }
 
-function ThreatLevelBadge({ level }: { level: ReturnType<typeof useCyberStore>['threatLevel'] }) {
+function ThreatLevelBadge({ level }: { level: ThreatLevel | null }) {
   if (!level) {
     return (
       <div className="flex items-center gap-1.5 px-2 py-1 bg-cyber-card rounded-sm border border-cyber-border">

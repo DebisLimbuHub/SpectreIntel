@@ -502,8 +502,7 @@ function populateAttackArcs(group: L.LayerGroup) {
     });
 
     // Arrowhead at destination
-    const lastTwo = points.slice(-2);
-    const arrow = L.circleMarker(
+    const arrow =L.circleMarker(
       [arc.toLat, arc.toLng],
       {
         radius: 4,

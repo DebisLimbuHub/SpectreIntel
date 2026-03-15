@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import type { CyberStock } from '@/types';
 
 /**
  * Cyber Stocks Panel — Cybersecurity sector stock tracker.
